@@ -1,5 +1,5 @@
 {
-  "name": "unstoppable-transactions",
+  "name": "unstoppable-erc20-transfers",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

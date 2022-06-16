@@ -33,6 +33,10 @@ function getTokenBalances(chainId, address) {
     return callApi(`/${chainId}/address/${address}/balances_v2`);
 }
 
+function getTransactions(chainId, address) {
+    return callApi(`/${chainId}/address/${address}/transactions_v2`);
+}
+
 function callApi(endpoint, params = '') {
 
   return new Promise((resolve, reject) => {
@@ -55,5 +59,5 @@ function callApi(endpoint, params = '') {
   });
 }
 
-export { getAllChains, getSupportedDexes, getSupportedDexesByChain, 
-        getDexChartData, getPools, getAllTokens, getTokens, getTokenBalances };
+export { getAllChains, getSupportedDexes, getSupportedDexesByChain, getDexChartData, 
+    getPools, getAllTokens, getTokens, getTokenBalances, getTransactions };
