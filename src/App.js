@@ -4,42 +4,36 @@ import { ethers } from 'ethers';
 import * as Covalent from './Covalent.js';
 import 'bootstrap-icons/font/bootstrap-icons.scss';
 
-/*
-TODO
-  Ajouter clientid : https://dashboard.auth.unstoppabledomains.com/connect?redirectTo=%2Fclients
-  format fees
-*/
-
 const CHAIN_ID = 1;
 const SCAN_URL = 'https://etherscan.io/tx/';
 
-const CLIENT_ID = 'c04b6d41-2e8d-4509-9196-52e31473b81e';
-const URI  = window.location.origin
+// redirectUri : 127.0.0.1
+//const CLIENT_ID = '96719a7e-8a22-4f4d-b050-2f604c418b65';
+
+// redirectUri : https://unstoppable-transactions.vercel.app/
+const CLIENT_ID = '7ebac5a8-65a0-40ef-a67a-391b38965ec3';
 
 const uauth = new UAuth({
   clientID: CLIENT_ID,
-  redirectUri: URI
-})
+  redirectUri: window.location.origin
+});
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
+    this.login = this.login.bind(this);
     this.state = { user: null, mode: 0, transactions: [] };
-  }
-  
-  componentDidMount() {
-    console.log("did mount !");
   }
 
   async login() {
     await uauth.loginWithPopup()
 
     uauth.user()
-      .then(user => {
-        console.log("Connected user :", user)
-        this.setState({user: user });
-        Covalent.getTransactions(CHAIN_ID, user).then(tx => {
+      .then(userInfo => {
+        console.log("Connected user :", userInfo)
+        this.setState({user: userInfo.sub });
+        Covalent.getTransactions(CHAIN_ID, userInfo.wallet_address).then(tx => {
           console.log('tx', tx);
           this.setState({transactions: tx.data.items, mode: 1 });
         });
@@ -48,19 +42,24 @@ class App extends React.Component {
       });
   }
 
+  fees(value) {
+    let bigNumberValue = ethers.utils.parseUnits(value, 0);
+    return ethers.utils.formatUnits(bigNumberValue);
+  }
+
   render() {
     return (
       <div className="container py-5">
           <h1 className='pb-3'>Unstoppable transactions</h1>
           { this.state.mode === 0 &&
           <div className='shadow p-4'>
-            <p className='lead mb-4'>Login to see your last transactions </p>
+            <p className='lead mb-4'>Login to see your transactions </p>
             <div id="btn-login" onClick={this.login} style={{cursor: 'pointer'}}><img src="unstop-button.png" alt="Login button" /></div>
           </div>
           }
           { this.state.mode === 1 &&
           <div>
-            <p className='lead'>Last transactions for <span className='text-success'>{this.state.user}</span></p>
+            <p className='lead'>Last transactions for <span className='fw-bold text-success'>{this.state.user}</span></p>
             <div className="table-responsive">
               <table className="table">
                 <thead>
@@ -81,7 +80,7 @@ class App extends React.Component {
                       <td><a href={ SCAN_URL + tx.tx_hash }>{tx.tx_hash}</a></td>
                       <td>{ tx.from_address_label} { tx.from_address }</td>
                       <td>{ tx.to_address_label}  { tx.to_address }</td>
-                      <td>{ tx.fees_paid }</td>
+                      <td>{ this.fees(tx.fees_paid) }</td>
                     </tr>
                   ) }
                 </tbody>
