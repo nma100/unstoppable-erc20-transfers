@@ -3,7 +3,7 @@ This application displays the last Ethereum transactions of a user.
 
 The user is authenticated by “Login with Unstoppable” feature.
 
-* Video demo : 
+* Video demo : https://youtu.be/vvux9APL1l4
 * Live site : https://unstoppable-transactions.vercel.app
 
 ## Contact information
